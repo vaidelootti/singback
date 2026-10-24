@@ -79,13 +79,12 @@ select{font:15px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid 
     <div class="stats" id="stats">streak 0</div>
   </header>
 
-  <div id="status"></div>
-
   <div class="staffbox">
     <svg id="staff" role="img" aria-label="Staff showing played and sung notes"></svg>
     <div id="task" hidden></div>
-    <div class="legend" id="legend"></div>
   </div>
+
+  <div id="status"></div>
 
   <div>
     <div id="live">—</div>
@@ -100,11 +99,6 @@ select{font:15px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid 
   </div>
 
   <section class="settings" aria-label="Settings">
-    <div class="row">
-      <label for="vol">Volume</label>
-      <input id="vol" type="range" min="1" max="10" step="1">
-      <span class="val" id="volVal"></span>
-    </div>
     <div class="row" data-modes="ear sight">
       <label for="nNotes">Notes</label>
       <input id="nNotes" type="range" min="2" max="7" step="1">
@@ -117,27 +111,10 @@ select{font:15px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid 
         <option value="all">Triads and 7ths</option>
       </select>
     </div>
-    <div class="row">
-      <label for="lo">Range</label>
-      <div class="pair">
-        <select id="lo" aria-label="Lowest note"></select>
-        <span>–</span>
-        <select id="hi" aria-label="Highest note"></select>
-      </div>
-    </div>
     <div class="row" data-modes="ear sight">
       <label for="bpm">Tempo</label>
       <input id="bpm" type="range" min="40" max="160" step="5">
       <span class="val" id="bpmVal"></span>
-    </div>
-    <div class="row">
-      <label for="sens">Mic sensitivity</label>
-      <input id="sens" type="range" min="1" max="5" step="1">
-      <span class="val" id="sensVal"></span>
-    </div>
-    <div class="row">
-      <label for="exact">Must match octave</label>
-      <input id="exact" type="checkbox">
     </div>
     <div class="row" data-modes="ear">
       <label for="peek">Show notes before singing</label>
@@ -155,6 +132,28 @@ select{font:15px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid 
       <label for="showName">Show chord name</label>
       <input id="showName" type="checkbox">
     </div>
+    <div class="row">
+      <label for="lo">Range</label>
+      <div class="pair">
+        <select id="lo" aria-label="Lowest note"></select>
+        <span>–</span>
+        <select id="hi" aria-label="Highest note"></select>
+      </div>
+    </div>
+    <div class="row">
+      <label for="exact">Must match octave</label>
+      <input id="exact" type="checkbox">
+    </div>
+    <div class="row">
+      <label for="vol">Volume</label>
+      <input id="vol" type="range" min="1" max="10" step="1">
+      <span class="val" id="volVal"></span>
+    </div>
+    <div class="row">
+      <label for="sens">Mic sensitivity</label>
+      <input id="sens" type="range" min="1" max="5" step="1">
+      <span class="val" id="sensVal"></span>
+    </div>
   </section>
 
   <p class="tip">Hold each note briefly. If room noise gets picked up as notes, lower the sensitivity. No sound? Check the silent switch.</p>
@@ -168,11 +167,12 @@ const pc=m=>((m%12)+12)%12;
 const SENS=[0.02,0.01,0.005,0.0025,0.0012];
 const $=id=>document.getElementById(id);
 
-let settings={n:3,lo:48,hi:69,bpm:60,exact:false,sens:4,peek:false,mode:'ear',vol:6,ivl:false,
+let settings={n:3,lo:48,hi:69,bpm:60,exact:false,sens:4,peek:false,mode:'ear',vol:8,ivl:false,
   chords:'triads',showTgt:true,showName:true};
 try{const s=JSON.parse(localStorage.getItem('singback2')||'null'); if(s) settings={...settings,...s};}catch(e){}
+settings.mode='ear';
 const save=()=>{try{localStorage.setItem('singback2',JSON.stringify(settings));}catch(e){}};
-const volGain=v=>2*Math.pow(10,(v-6)*3/20);
+const volGain=v=>8*Math.pow(10,(v-10)*3/20);
 
 // ---------- settings UI ----------
 for(const id of ['lo','hi']){
@@ -349,12 +349,10 @@ function drawStaff(){
       const nameShown=settings.showName||revealed;
       $('task').innerHTML=`Sing the ${chord.member}`+(nameShown?` <span class="name">· ${chord.name}</span>`:'');
     }
-    setLegend([['--fg','chord'],['--accent','note to sing'],['--ok','sung right'],['--bad','sung wrong']]);
     return;
   }
 
   $('task').hidden=true;
-  setLegend([['--fg','played'],['--ok','sung right'],['--bad','sung wrong']]);
   for(let i=0;i<n;i++){
     const cx=CLEF_W+i*COL_W+COL_W/2, s=sung[i];
     const both=showT&&seq[i]!=null&&s;
@@ -383,11 +381,11 @@ function pianoNote(m,t,dur,vel=1){
   const f=440*Math.pow(2,(m-69)/12);
   const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=Math.min(9000,f*9); lp.connect(master);
   const end=t+dur*0.97;
-  const amps=[1,0.5,0.32,0.2,0.13,0.08,0.05];
+  const amps=[1,0.8,0.6,0.45,0.32,0.2,0.12];
   amps.forEach((a,k)=>{
     const n=k+1, o=ctx.createOscillator(), g=ctx.createGain();
     o.type='sine'; o.frequency.value=f*n*Math.sqrt(1+0.0003*n*n);
-    const tau=0.55/(1+0.6*k)*(dur>1.5?1.8:1);
+    const tau=1.0/(1+0.6*k)*(dur>1.5?1.6:1);
     g.gain.setValueAtTime(0,t);
     g.gain.linearRampToValueAtTime(a*0.22*vel,t+0.005);
     g.gain.setTargetAtTime(0,t+0.005,tau);
@@ -488,7 +486,7 @@ function playSeq(){
   let total;
   if(mode==='chord'){
     status('Listen…'); total=2.2;
-    const vel=1/Math.sqrt(chord.notes.length);
+    const vel=0.7/Math.sqrt(chord.notes.length);
     chord.notes.forEach(s=>pianoNote(s.m,t0,total,vel));
   } else {
     const sight=mode==='sight';
@@ -518,12 +516,12 @@ function fail(silent){
 
 async function start(){
   if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)();
-    // volume gain -> fast limiter -> makeup gain: louder output without clipping
-    const lim=ctx.createDynamicsCompressor();
-    lim.threshold.value=-6; lim.knee.value=4; lim.ratio.value=20; lim.attack.value=0.002; lim.release.value=0.2;
-    const makeup=ctx.createGain(); makeup.gain.value=1.25;
+    // volume gain -> soft clipper: as loud as possible on a phone speaker without hard clipping
+    const sat=ctx.createWaveShaper(), N=2048, curve=new Float32Array(N);
+    for(let i=0;i<N;i++){const x=i/(N-1)*2-1; curve[i]=Math.tanh(x*2.5)/Math.tanh(2.5);}
+    sat.curve=curve; sat.oversample='2x';
     master=ctx.createGain(); master.gain.value=volGain(settings.vol);
-    master.connect(lim); lim.connect(makeup); makeup.connect(ctx.destination); }
+    master.connect(sat); sat.connect(ctx.destination); }
   if(starting) return; starting=true;
   // nothing here may wait forever: every step that can stall on iPhone has a time limit
   const limit=(p,ms,msg)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error(msg)),ms))]);
