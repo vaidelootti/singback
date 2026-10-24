@@ -98,16 +98,8 @@ select{font:15px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid 
       <span class="val" id="nVal"></span>
     </div>
     <div class="row">
-      <label for="preset">Range</label>
+      <label for="lo">Range</label>
       <div class="pair">
-        <select id="preset">
-          <option value="bass">Bass</option>
-          <option value="baritone">Baritone</option>
-          <option value="tenor">Tenor</option>
-          <option value="alto">Alto</option>
-          <option value="soprano">Soprano</option>
-          <option value="custom">Custom</option>
-        </select>
         <select id="lo" aria-label="Lowest note"></select>
         <span>–</span>
         <select id="hi" aria-label="Highest note"></select>
@@ -137,16 +129,15 @@ select{font:15px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid 
 </main>
 
 <script>
-/*GLYPH*/
+const GLYPH={"g": "M434 -2Q464 103 464 170Q464 223 427 257Q390 291 337 291Q287 291 250 262Q213 232 213 190Q213 160 234 134Q254 107 284 107Q313 107 332 128Q350 150 350 178Q350 240 280 240Q298 268 338 268Q353 268 368 264Q384 259 401 248Q418 237 428 214Q439 190 439 157Q439 136 411 6Q389 12 356 12Q259 12 190 -60Q120 -132 120 -232Q120 -267 132 -303Q143 -339 158 -366Q172 -394 200 -428Q229 -463 248 -484Q268 -504 303 -539Q280 -621 280 -689Q280 -779 313 -840Q346 -900 379 -900Q389 -900 402 -887Q414 -874 426 -851Q438 -828 446 -790Q455 -753 455 -710Q455 -551 342 -447L368 -329Q384 -332 397 -332Q458 -332 500 -282Q542 -233 542 -162Q542 -44 434 -2ZM426 -746Q426 -801 394 -801Q358 -801 333 -748Q308 -695 308 -630Q308 -588 321 -557Q359 -580 392 -640Q426 -699 426 -746ZM498 -128Q498 -183 466 -216Q434 -249 383 -249L428 -23Q498 -52 498 -128ZM407 -17 361 -247Q334 -241 312 -214Q289 -187 289 -158Q289 -143 295 -128Q301 -114 310 -104Q318 -94 327 -86Q336 -78 342 -74Q348 -71 348 -71L340 -66Q307 -75 278 -106Q248 -137 248 -184Q248 -231 278 -270Q307 -310 343 -323L325 -430Q168 -299 168 -177Q168 -104 223 -55Q278 -6 348 -6Q365 -6 407 -17Z", "f": "M564 -704Q582 -704 594 -691Q607 -678 607 -661Q607 -644 593 -631Q579 -618 563 -618Q521 -618 521 -663Q521 -681 534 -692Q547 -704 564 -704ZM607 -469Q607 -450 594 -437Q581 -424 564 -424Q521 -424 521 -469Q521 -485 534 -498Q546 -511 564 -511Q582 -511 594 -497Q607 -483 607 -469ZM285 -757Q366 -757 421 -702Q476 -646 476 -569Q476 -531 466 -495Q455 -459 432 -426Q409 -394 386 -367Q363 -340 326 -313Q289 -286 264 -268Q239 -249 196 -226Q154 -203 136 -194Q117 -184 80 -166L75 -182Q76 -183 102 -200Q128 -217 144 -228Q160 -238 192 -263Q223 -288 244 -310Q265 -331 292 -364Q318 -396 334 -427Q350 -458 362 -498Q373 -538 373 -578Q373 -735 262 -735Q225 -735 199 -726Q173 -716 162 -702Q150 -688 145 -678Q140 -667 140 -659Q140 -644 160 -644Q168 -644 179 -648Q190 -651 194 -651Q221 -651 239 -634Q257 -617 257 -592Q257 -563 235 -544Q213 -525 183 -525Q144 -525 119 -548Q94 -571 94 -607Q94 -673 150 -715Q207 -757 285 -757Z", "s": "M365 -24 319 -6V193L275 209V10L138 63V262L94 279V80L50 96V0L94 -17V-262L50 -245V-341L94 -358V-589L138 -606V-376L275 -429V-659L319 -675V-446L365 -464V-366L319 -348V-104L365 -122ZM275 -88V-332L138 -279V-34Z"};
 const NAMES=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
 const nm=m=>NAMES[((m%12)+12)%12]+(Math.floor(m/12)-1);
-const PRESETS={bass:[40,64],baritone:[43,67],tenor:[48,72],alto:[53,77],soprano:[60,84]};
 const SENS=[0.02,0.01,0.005,0.0025,0.0012];
 const $=id=>document.getElementById(id);
 
-let settings={n:3,preset:'tenor',lo:48,hi:72,bpm:60,exact:false,sens:4,peek:false};
-try{const s=JSON.parse(localStorage.getItem('singback')||'null'); if(s) settings={...settings,...s};}catch(e){}
-const save=()=>{try{localStorage.setItem('singback',JSON.stringify(settings));}catch(e){}};
+let settings={n:3,lo:48,hi:69,bpm:60,exact:false,sens:4,peek:false};
+try{const s=JSON.parse(localStorage.getItem('singback2')||'null'); if(s) settings={...settings,...s};}catch(e){}
+const save=()=>{try{localStorage.setItem('singback2',JSON.stringify(settings));}catch(e){}};
 
 // ---------- settings UI ----------
 for(const id of ['lo','hi']){
@@ -156,7 +147,7 @@ function syncUI(){
   $('nNotes').value=settings.n; $('nVal').textContent=settings.n;
   $('bpm').value=settings.bpm; $('bpmVal').textContent=settings.bpm;
   $('sens').value=settings.sens; $('sensVal').textContent=settings.sens;
-  $('preset').value=settings.preset; $('lo').value=settings.lo; $('hi').value=settings.hi;
+  $('lo').value=settings.lo; $('hi').value=settings.hi;
   $('exact').checked=settings.exact; $('peek').checked=settings.peek;
 }
 syncUI();
@@ -165,12 +156,10 @@ $('bpm').oninput=e=>{settings.bpm=+e.target.value;$('bpmVal').textContent=settin
 $('sens').oninput=e=>{settings.sens=+e.target.value;$('sensVal').textContent=settings.sens;save();};
 $('exact').onchange=e=>{settings.exact=e.target.checked;save();};
 $('peek').onchange=e=>{settings.peek=e.target.checked;save();drawStaff();};
-$('preset').onchange=e=>{settings.preset=e.target.value;
-  if(PRESETS[settings.preset]){[settings.lo,settings.hi]=PRESETS[settings.preset];} syncUI(); save(); drawStaff();};
 function rangeChange(which){
   let lo=+$('lo').value, hi=+$('hi').value;
   if(hi-lo<2){ if(which==='lo') hi=Math.min(88,lo+2); else lo=Math.max(36,hi-2); }
-  settings.lo=lo; settings.hi=hi; settings.preset='custom'; syncUI(); save(); drawStaff();
+  settings.lo=lo; settings.hi=hi; syncUI(); save(); drawStaff();
 }
 $('lo').onchange=()=>rangeChange('lo'); $('hi').onchange=()=>rangeChange('hi');
 
