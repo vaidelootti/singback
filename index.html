@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!doctype html>
 <html lang="en">
 <head>
@@ -66,6 +67,24 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent)}
 select{font:15px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
 .pair{display:flex;gap:6px;align-items:center}
 .tip{font-size:13px;color:var(--muted);margin:0;text-align:center}
+.hdr-right{display:flex;align-items:center;gap:10px}
+button.small{font:600 14px var(--sans);padding:7px 12px;border-radius:10px}
+#help{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.helpbar{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.helpbar h2{margin:0;font-size:18px}
+.helpbody{max-width:460px;margin:0 auto;padding-block:8px 40px;font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.helpbody h3{font-size:16px;margin:22px 0 6px}
+.helpbody ol,.helpbody ul{padding-left:20px;margin:6px 0}
+.helpbody li{margin:4px 0}
+.helpbody p{margin:8px 0}
+.defs{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:8px 0}
+.defs dt{font-weight:600}
+.defs dd{margin:0;color:var(--muted)}
+.defs.wide{grid-template-columns:1fr}
+.defs.wide dd{margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -76,7 +95,10 @@ select{font:15px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid 
       <option value="sight">Sight reading</option>
       <option value="chord">Chord</option>
     </select>
-    <div class="stats" id="stats">streak 0</div>
+    <div class="hdr-right">
+      <div class="stats" id="stats">streak 0</div>
+      <button id="helpBtn" class="small">Ohjeet</button>
+    </div>
   </header>
 
   <div class="staffbox">
@@ -158,6 +180,78 @@ select{font:15px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid 
 
   <p class="tip">Hold each note briefly. If room noise gets picked up as notes, lower the sensitivity. No sound? Check the silent switch.</p>
 </main>
+
+<div id="help" role="dialog" aria-modal="true" aria-labelledby="helpTitle" hidden>
+  <div class="helpbar">
+    <h2 id="helpTitle">Ohjeet</h2>
+    <button id="helpClose" class="small">Sulje</button>
+  </div>
+  <div class="helpbody">
+    <p>Sovellus soittaa säveliä tai soinnun, kuuntelee laulusi mikrofonilla ja kertoo heti, osuitko oikeaan. Valitse harjoitus vasemmasta yläkulmasta ja paina <b>Start</b>.</p>
+
+    <h3>Ear training – kuuntele ja laula takaisin</h3>
+    <ol>
+      <li>Kuuntele, kun ruudulla lukee <i>Listen…</i>. Nuotit ovat piilossa.</li>
+      <li>Kun lukee <i>Your turn</i>, laula sävelet järjestyksessä. Pidä jokaista säveltä hetki, jotta se tunnistetaan.</li>
+      <li>Kaikki oikein: piippaus ja uusi jono. Virhe: oikeat nuotit näytetään ja sama jono soitetaan uudelleen.</li>
+    </ol>
+
+    <h3>Sight reading – laula nuoteista</h3>
+    <ol>
+      <li>Nuotit näkyvät heti, ja vain aloitussävel soitetaan.</li>
+      <li>Kun lukee <i>Sing what you see</i>, laula koko jono, myös ensimmäinen sävel.</li>
+      <li>Virheen jälkeen aloitussävel soitetaan uudelleen samalle jonolle. <b>Replay</b> soittaa aloitussävelen.</li>
+    </ol>
+
+    <h3>Chord – laula soinnun sävel</h3>
+    <ol>
+      <li>Kuuntele sointu. Laulettava sävel on viivastolla sininen.</li>
+      <li>Viivaston alla lukee tehtävä, esim. <i>Sing the 3rd · F♯7</i>: laula pohjasävel (root), terssi (3rd), kvintti (5th) tai septimi (7th).</li>
+      <li>Oikein: piippaus ja uusi sointu. Väärin: sama sointu uudelleen.</li>
+    </ol>
+    <p>Soinnut ovat satunnaisissa käännöksissä. <i>C/E</i> tarkoittaa C-duuria, jonka alin sävel on E.</p>
+    <dl class="defs">
+      <dt>C</dt><dd>duuri</dd><dt>Cm</dt><dd>molli</dd>
+      <dt>Cdim</dt><dd>vähennetty</dd><dt>Caug</dt><dd>ylinouseva</dd>
+      <dt>Cmaj7</dt><dd>duuri, suuri septimi</dd><dt>C7</dt><dd>dominanttiseptimisointu</dd>
+      <dt>Cm7</dt><dd>molli, pieni septimi</dd><dt>Cm7♭5</dt><dd>puolivähennetty</dd>
+    </dl>
+
+    <h3>Ruudulla</h3>
+    <ul>
+      <li><b>Viivasto:</b> musta = soitettu, vihreä = laulettu oikein, punainen = laulettu väärin. Haalea sininen pallo seuraa laulamaasi korkeutta.</li>
+      <li><b>streak:</b> montako oikein peräkkäin. Nollautuu virheestä.</li>
+      <li><b>Sävelkorkeusnäyttö:</b> kuultu sävel ja poikkeama sentteinä. Neula keskellä = puhdas. Ohut palkki = kuinka voimakkaasti mikrofoni kuulee sinut.</li>
+      <li><b>Replay</b> soittaa tehtävän uudelleen, <b>New</b> antaa uuden.</li>
+      <li><i>Didn’t hear you. Again</i>: säveltä ei tunnistettu 8 sekuntiin.</li>
+    </ul>
+
+    <h3>Asetukset</h3>
+    <dl class="defs wide">
+      <dt>Notes</dt><dd>Jonon pituus, 2–7 säveltä.</dd>
+      <dt>Chords</dt><dd>Pelkät kolmisoinnut tai myös septimisoinnut.</dd>
+      <dt>Tempo</dt><dd>Soittonopeus, 40–160 iskua minuutissa.</dd>
+      <dt>Show notes before singing</dt><dd>Näyttää nuotit jo ennen laulamista (Ear training).</dd>
+      <dt>Show intervals</dt><dd>Intervallit nuottien välissä: m2 pieni sekunti, M2 suuri sekunti, m3 pieni terssi, M3 suuri terssi, P4 kvartti, TT tritonus, P5 kvintti, m6 pieni seksti, M6 suuri seksti, m7 pieni septimi, M7 suuri septimi, P8 oktaavi.</dd>
+      <dt>Show note to sing</dt><dd>Pois päältä laulettava sävel puuttuu viivastolta, ja se pitää löytää korvalla.</dd>
+      <dt>Show chord name</dt><dd>Pois päältä nimi näytetään vasta yrityksen jälkeen.</dd>
+      <dt>Range</dt><dd>Alin ja ylin käytettävä sävel.</dd>
+      <dt>Must match octave</dt><dd>Päällä myös oktaavin pitää osua. Pois päältä oikea sävel kelpaa millä tahansa oktaavilla.</dd>
+      <dt>Volume</dt><dd>Pianon voimakkuus, 1–10. Ylimmillä asetuksilla ääni särähtää hieman.</dd>
+      <dt>Mic sensitivity</dt><dd>Mikrofonin herkkyys, 1–5. Suurempi tunnistaa hiljaisemman laulun, mutta myös taustamelua.</dd>
+    </dl>
+
+    <h3>Ongelmia?</h3>
+    <ul>
+      <li><b>Ei ääntä:</b> tarkista äänetön-kytkin ja äänenvoimakkuus, nosta <b>Volume</b>.</li>
+      <li><b>Laulua ei tunnisteta:</b> nosta <b>Mic sensitivity</b> ja katso, liikkuuko ohut palkki.</li>
+      <li><b>Tunnistaa säveliä, joita et laulanut:</b> laske <b>Mic sensitivity</b>.</li>
+      <li><b>Start ei käynnisty:</b> sulje sovellus kokonaan ja avaa uudelleen. Tarkista, ettei muu sovellus käytä mikrofonia.</li>
+      <li><b>Microphone blocked:</b> salli mikrofoni sivustolle puhelimen asetuksista.</li>
+    </ul>
+    <p>Laula selkeästi yhdellä vokaalilla. Kuulokkeet estävät pianoääntä vuotamasta mikrofoniin.</p>
+  </div>
+</div>
 
 <script>
 const GLYPH={"g": "M434 -2Q464 103 464 170Q464 223 427 257Q390 291 337 291Q287 291 250 262Q213 232 213 190Q213 160 234 134Q254 107 284 107Q313 107 332 128Q350 150 350 178Q350 240 280 240Q298 268 338 268Q353 268 368 264Q384 259 401 248Q418 237 428 214Q439 190 439 157Q439 136 411 6Q389 12 356 12Q259 12 190 -60Q120 -132 120 -232Q120 -267 132 -303Q143 -339 158 -366Q172 -394 200 -428Q229 -463 248 -484Q268 -504 303 -539Q280 -621 280 -689Q280 -779 313 -840Q346 -900 379 -900Q389 -900 402 -887Q414 -874 426 -851Q438 -828 446 -790Q455 -753 455 -710Q455 -551 342 -447L368 -329Q384 -332 397 -332Q458 -332 500 -282Q542 -233 542 -162Q542 -44 434 -2ZM426 -746Q426 -801 394 -801Q358 -801 333 -748Q308 -695 308 -630Q308 -588 321 -557Q359 -580 392 -640Q426 -699 426 -746ZM498 -128Q498 -183 466 -216Q434 -249 383 -249L428 -23Q498 -52 498 -128ZM407 -17 361 -247Q334 -241 312 -214Q289 -187 289 -158Q289 -143 295 -128Q301 -114 310 -104Q318 -94 327 -86Q336 -78 342 -74Q348 -71 348 -71L340 -66Q307 -75 278 -106Q248 -137 248 -184Q248 -231 278 -270Q307 -310 343 -323L325 -430Q168 -299 168 -177Q168 -104 223 -55Q278 -6 348 -6Q365 -6 407 -17Z", "f": "M564 -704Q582 -704 594 -691Q607 -678 607 -661Q607 -644 593 -631Q579 -618 563 -618Q521 -618 521 -663Q521 -681 534 -692Q547 -704 564 -704ZM607 -469Q607 -450 594 -437Q581 -424 564 -424Q521 -424 521 -469Q521 -485 534 -498Q546 -511 564 -511Q582 -511 594 -497Q607 -483 607 -469ZM285 -757Q366 -757 421 -702Q476 -646 476 -569Q476 -531 466 -495Q455 -459 432 -426Q409 -394 386 -367Q363 -340 326 -313Q289 -286 264 -268Q239 -249 196 -226Q154 -203 136 -194Q117 -184 80 -166L75 -182Q76 -183 102 -200Q128 -217 144 -228Q160 -238 192 -263Q223 -288 244 -310Q265 -331 292 -364Q318 -396 334 -427Q350 -458 362 -498Q373 -538 373 -578Q373 -735 262 -735Q225 -735 199 -726Q173 -716 162 -702Q150 -688 145 -678Q140 -667 140 -659Q140 -644 160 -644Q168 -644 179 -648Q190 -651 194 -651Q221 -651 239 -634Q257 -617 257 -592Q257 -563 235 -544Q213 -525 183 -525Q144 -525 119 -548Q94 -571 94 -607Q94 -673 150 -715Q207 -757 285 -757Z", "s": "M365 -24 319 -6V193L275 209V10L138 63V262L94 279V80L50 96V0L94 -17V-262L50 -245V-341L94 -358V-589L138 -606V-376L275 -429V-659L319 -675V-446L365 -464V-366L319 -348V-104L365 -122ZM275 -88V-332L138 -279V-34Z", "b": "M222 -441Q275 -441 302 -408Q329 -375 329 -317Q329 -273 300 -234Q270 -195 192 -117Q115 -39 56 34V-783L99 -802V-402Q148 -441 222 -441ZM232 -308Q232 -373 183 -373Q159 -373 134 -358Q110 -344 99 -319V-87Q159 -155 196 -214Q232 -274 232 -308Z", "x": "M328 -232Q310 -232 299 -216Q288 -201 288 -178Q288 -126 328 -126H413V7H276V-78Q276 -117 222 -117Q200 -117 184 -105Q168 -93 168 -78V7H37V-126H122Q161 -126 161 -178Q161 -201 150 -216Q138 -232 122 -232H37V-366H168V-281Q168 -263 184 -252Q200 -240 222 -240Q276 -240 276 -281V-366H413V-232Z"};
@@ -561,6 +655,9 @@ function stop(){
   status(''); showLive(null); $('level').style.width='0'; drawStaff();
 }
 
+$('helpBtn').onclick=()=>{ $('help').hidden=false; $('help').scrollTop=0; $('helpClose').focus(); };
+$('helpClose').onclick=()=>{ $('help').hidden=true; $('helpBtn').focus(); };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('help').hidden=true; });
 $('startBtn').onclick=()=>{ running?stop():start(); };
 $('replayBtn').onclick=()=>{ if(running) playSeq(); };
 $('newBtn').onclick=()=>{ if(running){ newSeq(); playSeq(); } };
@@ -571,3 +668,5 @@ idleExample();
 </script>
 </body>
 </html>
+
+</body></html>
