@@ -132,6 +132,7 @@ button.small{font:600 14px var(--sans);padding:7px 12px;border-radius:10px}
       <select id="chords">
         <option value="triads">Triads</option>
         <option value="all">Triads and 7ths</option>
+        <option value="more">Advanced</option>
       </select>
     </div>
     <div class="row" data-modes="ear sight">
@@ -207,7 +208,7 @@ button.small{font:600 14px var(--sans);padding:7px 12px;border-radius:10px}
     <h3>Chord – laula soinnun sävel</h3>
     <ol>
       <li>Kuuntele sointu. Laulettava sävel on viivastolla sininen.</li>
-      <li>Viivaston alla lukee tehtävä, esim. <i>Sing the 3rd · F♯7</i>: laula pohjasävel (root), terssi (3rd), kvintti (5th) tai septimi (7th).</li>
+      <li>Viivaston alla lukee tehtävä, esim. <i>Sing the 3rd · F♯7</i>: laula pohjasävel (root), terssi (3rd), kvintti (5th) tai septimi (7th). Vaikeammissa soinnuissa myös sekunti (2nd), kvartti (4th) tai seksti (6th).</li>
       <li>Oikein: piippaus ja uusi sointu. Väärin: sama sointu uudelleen.</li>
     </ol>
     <p>Soinnut ovat satunnaisissa käännöksissä. <i>C/E</i> tarkoittaa C-duuria, jonka alin sävel on E.</p>
@@ -216,6 +217,10 @@ button.small{font:600 14px var(--sans);padding:7px 12px;border-radius:10px}
       <dt>Cdim</dt><dd>vähennetty</dd><dt>Caug</dt><dd>ylinouseva</dd>
       <dt>Cmaj7</dt><dd>duuri, suuri septimi</dd><dt>C7</dt><dd>dominanttiseptimisointu</dd>
       <dt>Cm7</dt><dd>molli, pieni septimi</dd><dt>Cm7♭5</dt><dd>puolivähennetty</dd>
+      <dt>Cdim7</dt><dd>vähennetty septimisointu</dd><dt>C6</dt><dd>duuri, suuri seksti</dd>
+      <dt>Cm6</dt><dd>molli, suuri seksti</dd><dt>Cm(maj7)</dt><dd>molli, suuri septimi</dd>
+      <dt>Csus4</dt><dd>kvartti terssin tilalla</dd><dt>Csus2</dt><dd>sekunti terssin tilalla</dd>
+      <dt>C7sus4</dt><dd>sus4 ja pieni septimi</dd>
     </dl>
 
     <h3>Ruudulla</h3>
@@ -230,7 +235,7 @@ button.small{font:600 14px var(--sans);padding:7px 12px;border-radius:10px}
     <h3>Asetukset</h3>
     <dl class="defs wide">
       <dt>Notes</dt><dd>Jonon pituus, 2–7 säveltä.</dd>
-      <dt>Chords</dt><dd>Pelkät kolmisoinnut tai myös septimisoinnut.</dd>
+      <dt>Chords</dt><dd>Pelkät kolmisoinnut (<i>Triads</i>), myös septimisoinnut (<i>Triads and 7ths</i>) tai lisäksi vaikeampia sointuja, kuten vähennetyt septimisoinnut, sekstisoinnut ja sus-soinnut (<i>Advanced</i>).</dd>
       <dt>Tempo</dt><dd>Soittonopeus, 40–160 iskua minuutissa.</dd>
       <dt>Show notes before singing</dt><dd>Näyttää nuotit jo ennen laulamista (Ear training).</dd>
       <dt>Show intervals</dt><dd>Intervallit nuottien välissä: m2 pieni sekunti, M2 suuri sekunti, m3 pieni terssi, M3 suuri terssi, P4 kvartti, TT tritonus, P5 kvintti, m6 pieni seksti, M6 suuri seksti, m7 pieni septimi, M7 suuri septimi, P8 oktaavi.</dd>
@@ -311,16 +316,27 @@ const CHORDS={
   maj:{iv:[0,4,7],sym:'',roots:R_MAJ}, min:{iv:[0,3,7],sym:'m',roots:R_MIN},
   dim:{iv:[0,3,6],sym:'dim',roots:R_DIM}, aug:{iv:[0,4,8],sym:'aug',roots:R_MAJ},
   maj7:{iv:[0,4,7,11],sym:'maj7',roots:R_MAJ}, dom7:{iv:[0,4,7,10],sym:'7',roots:R_MAJ},
-  min7:{iv:[0,3,7,10],sym:'m7',roots:R_MIN}, hdim:{iv:[0,3,6,10],sym:'m7♭5',roots:R_DIM}
+  min7:{iv:[0,3,7,10],sym:'m7',roots:R_MIN}, hdim:{iv:[0,3,6,10],sym:'m7♭5',roots:R_DIM},
+  // harder chords: deg = letter steps above the root, mem = what each member is called, maxInv = highest inversion used
+  dim7:{iv:[0,3,6,9],sym:'dim7',roots:R_DIM},
+  six:{iv:[0,4,7,9],sym:'6',roots:R_MAJ,deg:[0,2,4,5],mem:['root','3rd','5th','6th'],maxInv:1},
+  min6:{iv:[0,3,7,9],sym:'m6',roots:R_MIN,deg:[0,2,4,5],mem:['root','3rd','5th','6th'],maxInv:1},
+  mmaj7:{iv:[0,3,7,11],sym:'m(maj7)',roots:R_MIN},
+  sus4:{iv:[0,5,7],sym:'sus4',roots:R_MAJ,deg:[0,3,4],mem:['root','4th','5th'],maxInv:0},
+  sus2:{iv:[0,2,7],sym:'sus2',roots:R_MAJ,deg:[0,1,4],mem:['root','2nd','5th'],maxInv:0},
+  sus7:{iv:[0,5,7,10],sym:'7sus4',roots:R_MAJ,deg:[0,3,4,6],mem:['root','4th','5th','7th'],maxInv:0}
 };
 const MEMBER=['root','3rd','5th','7th'];
 function rnd(n){return Math.floor(Math.random()*n);}
 function makeChord(){
-  const pool=settings.chords==='all'
-    ?['maj','maj','min','min','dim','aug','maj7','dom7','dom7','min7','hdim']
-    :['maj','maj','min','min','dim','aug'];
+  const POOLS={
+    triads:['maj','maj','min','min','dim','aug'],
+    all:['maj','maj','min','min','dim','aug','maj7','dom7','dom7','min7','hdim'],
+    more:['maj','min','dim','aug','maj7','dom7','min7','hdim','dim7','dim7','six','min6','mmaj7','sus4','sus2','sus7']
+  };
+  const pool=POOLS[settings.chords]||POOLS.triads;
   for(let tries=0;tries<200;tries++){
-    const type=pool[rnd(pool.length)], C=CHORDS[type], k=C.iv.length, inv=rnd(k);
+    const type=pool[rnd(pool.length)], C=CHORDS[type], k=C.iv.length, inv=rnd(Math.min(k,(C.maxInv??k-1)+1));
     const offs=C.iv.map((v,j)=>v+(j<inv?12:0));
     const minO=Math.min(...offs), maxO=Math.max(...offs);
     const rootLo=settings.lo-minO, rootHi=settings.hi-maxO;
@@ -329,7 +345,7 @@ function makeChord(){
     const rs=C.roots[pc(root)], rl=LNAME.indexOf(rs[0]), ra=pc(root)-NAT[rl];
     const ra2=ra>6?ra-12:ra<-6?ra+12:ra;
     const notes=C.iv.map((v,j)=>{
-      const m=root+offs[j], l=(rl+2*j)%7;
+      const m=root+offs[j], l=(rl+(C.deg?C.deg[j]:2*j))%7;
       let a=pc(m)-NAT[l]; if(a>6)a-=12; if(a<-6)a+=12;
       return {m,l,a,j};
     }).sort((x,y)=>x.m-y.m);
@@ -337,7 +353,7 @@ function makeChord(){
     const rootName=LNAME[rl]+ACC[ra2];
     const bass=notes[0];
     const name=rootName+C.sym+(inv?'/'+spName(bass):'');
-    return {notes,tgt,member:MEMBER[t],name};
+    return {notes,tgt,member:(C.mem||MEMBER)[t],name};
   }
   // range too narrow: fall back to a C-major-ish triad at the bottom
   const m=settings.lo, notes=[sharpSpell(m),sharpSpell(m+4),sharpSpell(m+7)].map((n,j)=>({...n,j}));
