@@ -600,10 +600,12 @@ function newSeq(){
   if(settings.mode==='chord'){ chord=makeChord(); seq=[chord.tgt.m]; return; }
   chord=null;
   const {n,lo,hi}=settings; seq=[]; let prev=null;
+  // never the same note (or the same note an octave away) twice in a row; leaps at most an octave
   for(let i=0;i<n;i++){
-    let m, guard=0;
-    do{ m=lo+rnd(hi-lo+1); guard++; }
-    while(guard<100 && prev!==null && ((m-prev)%12===0 || Math.abs(m-prev)>12));
+    const all=[]; for(let m=lo;m<=hi;m++) all.push(m);
+    let pool=prev===null?all:all.filter(m=>(m-prev)%12!==0&&Math.abs(m-prev)<=12);
+    if(!pool.length) pool=all.filter(m=>(m-prev)%12!==0);
+    const m=pool[rnd(pool.length)];
     seq.push(m); prev=m;
   }
 }
